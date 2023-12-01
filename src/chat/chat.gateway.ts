@@ -71,12 +71,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('privateMessage')
   handlePrivateMessage(
-    @MessageBody() data: { to: string; message: string },
+    @MessageBody() data: { data: { to: string; message: string } },
     @ConnectedSocket() client: Socket,
   ) {
-    this.server.to(data.to).emit('privateMessage', {
-      data: data.message,
-      from: client['username'],
-    });
+    this.server
+      .to(data.data.to)
+      .to(client.id)
+      .emit('privateMessage', {
+        data: {
+          data: data.data.message,
+        },
+        from: client['username'],
+      });
   }
 }
